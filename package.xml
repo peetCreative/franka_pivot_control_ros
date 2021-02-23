@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package>
+    <name>franka_pivot_control_ros</name>
+    <version>0.0.1</version>
+    <description>
+        ros package for connecting franka_pivot_control and ros
+    </description>
+    <maintainer email="s1856172@mail.zih.tu-dresden.de">Peter Klausing</maintainer>
+    <license>GPLv3</license>
+
+    <url type="repository">https://github.com/peetCreative/franka_pivot_control_ros</url>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <build_depend>roscpp</build_depend>
+    <build_depend>pivot_control_messages_ros</build_depend>
+    <run_depend>roscpp</run_depend>
+
+</package>
