@@ -1,0 +1,16 @@
+<launch>
+    <group ns="franka_pivot_control">
+        <arg name="robot_ip" default="" />
+
+        <node name="franka_pivot_control" pkg="franka_pivot_control_ros" type="franka_pivot_control_ros">
+            <param name="robot_ip" value="$(arg robot_ip)"/>
+            <param name="frame_id" value="laparoscope"/>
+        </node>
+
+        <node name="keyboard_controller" pkg="pivot_control_messages_ros" type="keyboardController.py">
+            <remap from="target_dof_pose" to="target/laparoscope_dof_pose"/>
+            <remap from="dof_boundaries" to="laparoscope_dof_boundaries"/>
+            <remap from="current_dof_pose" to="current/laparoscope_dof_pose"/>
+        </node>
+    </group>
+</launch>
