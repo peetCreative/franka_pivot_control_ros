@@ -8,9 +8,9 @@
         </node>
 
         <node name="keyboard_controller" pkg="pivot_control_messages_ros" type="keyboardController.py">
-            <remap from="target_dof_pose" to="target/laparoscope_dof_pose"/>
-            <remap from="dof_boundaries" to="laparoscope_dof_boundaries"/>
-            <remap from="current_dof_pose" to="current/laparoscope_dof_pose"/>
+            <remap to="target_dof_pose" from="target/laparoscope_dof_pose"/>
+            <remap to="dof_boundaries" from="laparoscope_dof_boundaries"/>
+            <remap to="current_dof_pose" from="current/laparoscope_dof_pose"/>
         </node>
     </group>
 </launch>
