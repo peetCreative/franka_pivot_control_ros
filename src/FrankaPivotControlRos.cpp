@@ -34,7 +34,7 @@ public:
             mCurrentDOFPosePublisher.publish(poseRos);
         }
         pivot_control_messages::DOFBoundaries boundaries;
-        if (!mFPC->getDOFBoundaries(boundaries))
+        if (mFPC->getDOFBoundaries(boundaries))
         {
             pivot_control_messages_ros::LaparoscopeDOFBoundaries boundariesROS =
                 pivot_control_messages_ros::toROSDOFBoundaries(boundaries, mFrameId, mSeq++);
@@ -53,7 +53,16 @@ public:
 
     int run()
     {
-        ros::spin();
+        if (!mFPC->isReady())
+        {
+             ROS_DEBUG_NAMED("FrankaPivotControllerROS", "Stop");
+            ros::shutdown();
+            return 1;
+        }
+        while(ros::ok())
+        {
+            ros::spinOnce();
+        }
         return 0;
     }
 
@@ -79,7 +88,7 @@ public:
             nh->advertise<pivot_control_messages_ros::LaparoscopeDOFPose>(
                     "current_dof_pose", 1);
         mDOFBoundariesPublisher =
-            nh->advertise<pivot_control_messages_ros::LaparoscopeDOFPose>(
+            nh->advertise<pivot_control_messages_ros::LaparoscopeDOFBoundaries>(
                     "dof_boundaries", 1);
         mPublishTimer = nh->createTimer(
                 ros::Duration(0.05),
