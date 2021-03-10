@@ -5,7 +5,8 @@
         <arg name="dynamic_rel" default="0.5"/>
         <arg name="start_keyboard_controller" default="true" />
 
-        <node name="franka_pivot_control" pkg="franka_pivot_control_ros" type="franka_pivot_control_ros">
+        <node name="franka_pivot_control" pkg="franka_pivot_control_ros" type="franka_pivot_control_ros"
+            output="screen" required="true">
             <param name="robot_ip" value="$(arg robot_ip)"/>
             <param name="distance_ee_to_pp" value="$(arg distance_ee_to_pp)"/>
             <param name="frame_id" value="laparoscope"/>

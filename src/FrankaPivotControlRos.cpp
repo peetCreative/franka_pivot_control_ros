@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
             pnh->getParam(paramName, robotIP)))
     {
         ROS_ERROR("could not find robot_ip");
-        return 1;
+        return 0;
     }
     if(pnh->searchParam("frame_id", paramName))
         pnh->getParam(paramName, frameId);
