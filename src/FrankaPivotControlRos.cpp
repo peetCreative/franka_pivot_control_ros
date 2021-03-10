@@ -57,7 +57,7 @@ public:
         {
              ROS_DEBUG_NAMED("FrankaPivotControllerROS", "Stop");
             ros::shutdown();
-            return 1;
+            return 0;
         }
         while(ros::ok())
         {
@@ -70,9 +70,9 @@ public:
             ros::NodeHandle *nh,
             std::string robotIP,
             std::string frameId,
-            float distanceEE2PP = 0.2,
-            float maxWaypointDist = 0.01,
-            float cameraTilt = -0.52359):
+            double distanceEE2PP = 0.2,
+            double maxWaypointDist = 0.01,
+            double cameraTilt = -0.52359):
             mFrameId(frameId)
     {
         mFPC = std::make_unique<
@@ -108,9 +108,9 @@ int main(int argc, char *argv[])
     std::string paramName;
     std::string robotIP = "";
     std::string frameId = "laparoscope_pivot";
-    float distanceEE2PP = 0.2;
-    float maxWaypointDist = 0.01;
-    float cameraTilt = -0.52359;
+    double distanceEE2PP = 0.5;
+    double dynamicRel = 0.05;
+    double cameraTilt = -0.52359;
     if(!(pnh->searchParam("robot_ip", paramName) &&
             pnh->getParam(paramName, robotIP)))
     {
@@ -120,14 +120,24 @@ int main(int argc, char *argv[])
     if(pnh->searchParam("frame_id", paramName))
         pnh->getParam(paramName, frameId);
     if(pnh->searchParam("distance_ee_to_pp", paramName))
+    {
         pnh->getParam(paramName, distanceEE2PP);
-    if(pnh->searchParam("max_waypoint_distance", paramName))
-        pnh->getParam(paramName, maxWaypointDist);
+        ROS_INFO_STREAM_NAMED("franka_pivot_control_ros",
+                              "set distanceEE2PP to " << distanceEE2PP);
+    }
+    if(pnh->searchParam("dynamic_rel", paramName))
+    {
+        pnh->getParam(paramName, dynamicRel);
+        ROS_INFO_STREAM_NAMED("franka_pivot_control_ros",
+                              "set dynamicRel to " << dynamicRel);
+    }
     if(pnh->searchParam("camera_tilt", paramName))
         pnh->getParam(paramName, cameraTilt);
 
+    ROS_INFO_STREAM_NAMED("franka_pivot_control_ros",
+                          "start pivot controller");
     FrankaPivotControllerRos fpcr(
             nh, robotIP, frameId,
-            distanceEE2PP, maxWaypointDist, cameraTilt);
+            distanceEE2PP, dynamicRel, cameraTilt);
     return fpcr.run();
 }
