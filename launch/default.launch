@@ -16,9 +16,9 @@
         </node>
 
         <node if="$(arg enable_keyboard_controller)" name="keyboard_controller" pkg="pivot_control_messages_ros" type="keyboardController.py">
-            <remap to="target/laparoscope_dof_pose" from="/laparoscope/pivot_controller/target/laparoscope_dof_pose"/>
-            <remap to="laparoscope_dof_boundaries" from="/laparoscope/pivot_controller/laparoscope_dof_boundaries"/>
-            <remap to="current/laparoscope_dof_pose" from="/laparoscope/pivot_controller/current/laparoscope_dof_pose"/>
+            <remap from="target/laparoscope_dof_pose" to="/laparoscope/pivot_controller/target/laparoscope_dof_pose"/>
+            <remap from="laparoscope_dof_boundaries" to="/laparoscope/pivot_controller/laparoscope_dof_boundaries"/>
+            <remap from="current/laparoscope_dof_pose" to="/laparoscope/pivot_controller/current/laparoscope_dof_pose"/>
         </node>
     </group>
 </launch>
