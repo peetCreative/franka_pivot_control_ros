@@ -1,9 +1,8 @@
 <launch>
     <arg name="robot_ip" default="" />
-    <arg name="robot_ip" default="" />
-    <arg name="distance_ee_to_pp" default="0.56" />
-    <arg name="dynamic_rel" default="0.05"/>
-    <arg name="camera_tilt" default="-0.523599">
+    <arg name="distance_ee_to_pp" default="0.465" />
+    <arg name="dynamic_rel" default="0.3"/>
+    <arg name="camera_tilt" default="0.0"/>
     <arg name="enable_keyboard_controller" default="false" />
     <arg name="required" default="true" />
     <group ns="franka_pivot_control">
