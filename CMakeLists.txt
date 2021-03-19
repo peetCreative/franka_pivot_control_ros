@@ -7,6 +7,10 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/CMake")
 find_package(catkin REQUIRED COMPONENTS
         roscpp
         pivot_control_messages_ros
+        geometry_msgs
+        tf2
+        tf2_ros
+        tf2_geometry_msgs
         )
 
 SET(franka_pivot_control_HOME)

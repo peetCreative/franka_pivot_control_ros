@@ -9,6 +9,9 @@
 
 #include "ros/ros.h"
 #include <ros/time.h>
+#include <tf2_ros/transform_broadcaster.h>
+#include <geometry_msgs/TransformStamped.h>
+
 #include <memory>
 
 typedef std::unique_ptr<franka_pivot_control::FrankaPivotController> FPCPtr;
@@ -39,7 +42,24 @@ public:
             pivot_control_messages_ros::LaparoscopeDOFBoundaries boundariesROS =
                 pivot_control_messages_ros::toROSDOFBoundaries(boundaries, mFrameId, mSeq++);
             mDOFBoundariesPublisher.publish(boundariesROS);
-
+        }
+        std::array<double, 3> translation;
+        std::array<double, 4> rotation;
+        if (mFPC->getCurrentTipPose(translation, rotation))
+        {
+            static tf2_ros::TransformBroadcaster br;
+            geometry_msgs::TransformStamped transformStamped;
+            transformStamped.header.stamp = ros::Time::now();
+            transformStamped.header.frame_id = "world";
+            transformStamped.child_frame_id = "camera";
+            transformStamped.transform.translation.x = translation.at(0);
+            transformStamped.transform.translation.y = translation.at(1);
+            transformStamped.transform.translation.z = translation.at(2);
+            transformStamped.transform.rotation.w = rotation.at(0);
+            transformStamped.transform.rotation.x = rotation.at(1);
+            transformStamped.transform.rotation.y = rotation.at(2);
+            transformStamped.transform.rotation.z = rotation.at(3);
+            br.sendTransform(transformStamped);
         }
     }
 
@@ -71,13 +91,14 @@ public:
             std::string robotIP,
             std::string frameId,
             double distanceEE2PP = 0.2,
+            double distanceEE2Tip = 0.2,
             double maxWaypointDist = 0.01,
             double cameraTilt = -0.52359):
             mFrameId(frameId)
     {
         mFPC = std::make_unique<
                 franka_pivot_control::FrankaPivotController>(
-                        robotIP, distanceEE2PP,
+                        robotIP, distanceEE2PP, distanceEE2Tip,
                         maxWaypointDist, cameraTilt);
         mTargetDOFPoseSubscriber =
             nh->subscribe<pivot_control_messages_ros::LaparoscopeDOFPose>(
@@ -109,6 +130,7 @@ int main(int argc, char *argv[])
     std::string robotIP = "";
     std::string frameId = "laparoscope_pivot";
     double distanceEE2PP = 0.5;
+    double distanceEE2CameraTip = 0.5;
     double dynamicRel = 0.05;
     double cameraTilt = -0.52359;
     if(!(pnh->searchParam("robot_ip", paramName) &&
@@ -125,6 +147,12 @@ int main(int argc, char *argv[])
         ROS_INFO_STREAM_NAMED("franka_pivot_control_ros",
                               "set distanceEE2PP to " << distanceEE2PP);
     }
+    if(pnh->searchParam("distance_ee_to_camera_tip", paramName))
+    {
+        pnh->getParam(paramName, distanceEE2CameraTip);
+        ROS_INFO_STREAM_NAMED("franka_pivot_control_ros",
+                              "set distanceEE2CameraTip to " << distanceEE2CameraTip);
+    }
     if(pnh->searchParam("dynamic_rel", paramName))
     {
         pnh->getParam(paramName, dynamicRel);
@@ -138,6 +166,7 @@ int main(int argc, char *argv[])
                           "start pivot controller");
     FrankaPivotControllerRos fpcr(
             nh, robotIP, frameId,
-            distanceEE2PP, dynamicRel, cameraTilt);
+            distanceEE2PP, distanceEE2CameraTip,
+            dynamicRel, cameraTilt);
     return fpcr.run();
 }
