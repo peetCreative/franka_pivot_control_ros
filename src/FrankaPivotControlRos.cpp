@@ -5,6 +5,7 @@
 #include "PivotControlMessages.h"
 #include "pivot_control_messages_ros/LaparoscopeDOFPose.h"
 #include "pivot_control_messages_ros/LaparoscopeDOFBoundaries.h"
+#include "pivot_control_messages_ros/PivotError.h"
 #include "PivotControlMessagesRos.h"
 
 #include "ros/ros.h"
@@ -26,21 +27,26 @@ private:
     ros::Subscriber mTargetDOFPoseSubscriber;
     ros::Publisher mCurrentDOFPosePublisher;
     ros::Publisher mDOFBoundariesPublisher;
+    ros::Publisher mPivotErrorPublisher;
 public:
     void statePublisher(const ros::TimerEvent&)
     {
+        mSeq++;
+        auto now = ros::Time::now();
         pivot_control_messages::DOFPose pose;
         if (mFPC->getCurrentDOFPose(pose))
         {
             pivot_control_messages_ros::LaparoscopeDOFPose poseRos =
-                pivot_control_messages_ros::toROSDOFPose(pose, mFrameId, mSeq++);
+                pivot_control_messages_ros::toROSDOFPose(pose, mFrameId, mSeq);
+            poseRos.header.stamp = now;
             mCurrentDOFPosePublisher.publish(poseRos);
         }
         pivot_control_messages::DOFBoundaries boundaries;
         if (mFPC->getDOFBoundaries(boundaries))
         {
             pivot_control_messages_ros::LaparoscopeDOFBoundaries boundariesROS =
-                pivot_control_messages_ros::toROSDOFBoundaries(boundaries, mFrameId, mSeq++);
+                pivot_control_messages_ros::toROSDOFBoundaries(boundaries, mFrameId, mSeq);
+            boundariesROS.header.stamp = now;
             mDOFBoundariesPublisher.publish(boundariesROS);
         }
         std::array<double, 3> translation;
@@ -49,7 +55,8 @@ public:
         {
             static tf2_ros::TransformBroadcaster br;
             geometry_msgs::TransformStamped transformStamped;
-            transformStamped.header.stamp = ros::Time::now();
+            transformStamped.header.stamp = now;
+            transformStamped.header.seq = mSeq;
             transformStamped.header.frame_id = "world";
             transformStamped.child_frame_id = "camera";
             transformStamped.transform.translation.x = translation.at(0);
@@ -60,6 +67,16 @@ public:
             transformStamped.transform.rotation.y = rotation.at(2);
             transformStamped.transform.rotation.z = rotation.at(3);
             br.sendTransform(transformStamped);
+        }
+        double error;
+        if (mFPC->getError(error))
+        {
+            pivot_control_messages_ros::PivotError errorMsg;
+            errorMsg.header.stamp = now;
+            errorMsg.header.seq = mSeq;
+            errorMsg.header.frame_id = "pivot_point";
+            errorMsg.pivot_error = error;
+            mPivotErrorPublisher.publish(errorMsg);
         }
     }
 
@@ -111,6 +128,9 @@ public:
         mDOFBoundariesPublisher =
             nh->advertise<pivot_control_messages_ros::LaparoscopeDOFBoundaries>(
                     "dof_boundaries", 1);
+        mPivotErrorPublisher =
+            nh->advertise<pivot_control_messages_ros::PivotError>(
+                    "pivot_error", 1);
         mPublishTimer = nh->createTimer(
                 ros::Duration(0.05),
                &FrankaPivotControllerRos::statePublisher, this,
