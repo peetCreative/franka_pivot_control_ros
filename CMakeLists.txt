@@ -24,7 +24,7 @@ else()
 endif()
 
 catkin_package(
-        INCLUDE_DIRS include
+#        INCLUDE_DIRS include
         #  LIBRARIES esvr2_ros
         CATKIN_DEPENDS roscpp
         #  DEPENDS system_lib
