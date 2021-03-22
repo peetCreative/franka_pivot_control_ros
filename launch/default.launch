@@ -17,6 +17,7 @@
             <remap from="target_dof_pose" to="/laparoscope/pivot_controller/target/laparoscope_dof_pose" />
             <remap from="dof_boundaries" to="/laparoscope/pivot_controller/laparoscope_dof_boundaries" />
             <remap from="current_dof_pose" to="/laparoscope/pivot_controller/current/laparoscope_dof_pose" />
+            <remap from="pivot_error" to="/laparoscope/pivot_controller/current/pivot_error"/>
         </node>
 
         <node if="$(arg enable_keyboard_controller)" name="keyboard_controller" pkg="pivot_control_messages_ros" type="keyboardController.py"
