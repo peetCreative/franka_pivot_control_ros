@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     std::string robotIP = "";
     std::string frameId = "laparoscope_pivot";
     double distanceEE2PP = 0.5;
-    double distanceEE2CameraTip = 0.5;
+    double distanceEE2CameraTip = 0.505;
     double dynamicRel = 0.05;
     double cameraTilt = -0.52359;
     if(!(pnh->searchParam("robot_ip", paramName) &&
