@@ -7,12 +7,15 @@
 #include "pivot_control_messages_ros/LaparoscopeDOFBoundaries.h"
 #include "pivot_control_messages_ros/PivotError.h"
 #include "pivot_control_messages_ros/FrankaError.h"
+#include "pivot_control_messages_ros/SetFloat.h"
+#include "pivot_control_messages_ros/SetJointSpacePose.h"
 #include "PivotControlMessagesRos.h"
 
 #include "ros/ros.h"
 #include <ros/time.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/TransformStamped.h>
+#include <std_srvs/Trigger.h>
 
 #include <memory>
 
@@ -30,6 +33,10 @@ private:
     ros::Publisher mDOFBoundariesPublisher;
     ros::Publisher mPivotErrorPublisher;
     ros::Publisher mFrankaErrorPublisher;
+    ros::ServiceServer mMoveCartesianZService;
+    ros::ServiceServer mMoveJointSpaceService;
+    ros::ServiceServer mStartPivotingService;
+    ros::ServiceServer mStopPivotingService;
 public:
     void statePublisher(const ros::TimerEvent&)
     {
@@ -100,6 +107,45 @@ public:
         mFPC->setTargetDOFPose(pose);
     };
 
+    bool startPivoting(
+        std_srvs::Trigger::Request &, std_srvs::Trigger::Response &resp)
+    {
+        bool succ = mFPC->startPivoting();
+        resp.success = succ;
+        return succ;
+    }
+
+    bool stopPivoting(
+        std_srvs::Trigger::Request &, std_srvs::Trigger::Response &resp)
+    {
+        bool succ = mFPC->stopPivoting();
+        resp.success = succ;
+        return succ;
+    }
+
+    bool moveCartesianZ(
+        pivot_control_messages_ros::SetFloat::Request &request,
+        pivot_control_messages_ros::SetFloat::Response &response)
+    {
+        bool succ = mFPC->moveCartesianZ(request.data);
+        response.success = succ;
+        return succ;
+        // if we are at initial pose STEP1 moveoout
+        // move out to -5cm
+    }
+
+    bool moveJointSpace(
+        pivot_control_messages_ros::SetJointSpacePose::Request &req,
+        pivot_control_messages_ros::SetJointSpacePose::Response &response)
+    {
+        std::array<double,7> bla {
+            req.data[0], req.data[1], req.data[2], req.data[3],
+            req.data[4], req.data[5], req.data[6]};
+        bool succ = mFPC->moveJointSpace(bla);
+        response.success = succ;
+        return succ;
+    }
+
     int run()
     {
         if (!mFPC->isReady())
@@ -146,6 +192,22 @@ public:
         mFrankaErrorPublisher =
             nh->advertise<pivot_control_messages_ros::FrankaError>(
                     "franka_error", 1);
+        mMoveCartesianZService =
+            nh->advertiseService(
+                "move_cartesian_z",
+                &FrankaPivotControllerRos::moveCartesianZ, this);
+        mMoveJointSpaceService =
+            nh->advertiseService(
+                "move_joint_space",
+                &FrankaPivotControllerRos::moveJointSpace, this);
+        mStartPivotingService =
+            nh->advertiseService(
+                "start_pivoting",
+                &FrankaPivotControllerRos::startPivoting, this);
+        mStopPivotingService =
+            nh->advertiseService(
+                "stop_pivoting",
+                &FrankaPivotControllerRos::stopPivoting, this);
         mPublishTimer = nh->createTimer(
                 ros::Duration(0.05),
                &FrankaPivotControllerRos::statePublisher, this,
