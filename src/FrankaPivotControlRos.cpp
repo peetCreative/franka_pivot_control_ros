@@ -6,6 +6,7 @@
 #include "pivot_control_messages_ros/LaparoscopeDOFPose.h"
 #include "pivot_control_messages_ros/LaparoscopeDOFBoundaries.h"
 #include "pivot_control_messages_ros/PivotError.h"
+#include "pivot_control_messages_ros/FrankaError.h"
 #include "PivotControlMessagesRos.h"
 
 #include "ros/ros.h"
@@ -28,6 +29,7 @@ private:
     ros::Publisher mCurrentDOFPosePublisher;
     ros::Publisher mDOFBoundariesPublisher;
     ros::Publisher mPivotErrorPublisher;
+    ros::Publisher mFrankaErrorPublisher;
 public:
     void statePublisher(const ros::TimerEvent&)
     {
@@ -77,6 +79,16 @@ public:
             errorMsg.header.frame_id = "pivot_point";
             errorMsg.pivot_error = error;
             mPivotErrorPublisher.publish(errorMsg);
+        }
+        std::string frankaError;
+        if (mFPC->getFrankaError(frankaError))
+        {
+            pivot_control_messages_ros::FrankaError frankaErrorMsg;
+            frankaErrorMsg.header.stamp = now;
+            frankaErrorMsg.header.seq = mSeq;
+            frankaErrorMsg.header.frame_id = "pivot_point";
+            frankaErrorMsg.franka_error = frankaError;
+            mFrankaErrorPublisher.publish(frankaErrorMsg);
         }
     }
 
@@ -131,6 +143,9 @@ public:
         mPivotErrorPublisher =
             nh->advertise<pivot_control_messages_ros::PivotError>(
                     "pivot_error", 1);
+        mFrankaErrorPublisher =
+            nh->advertise<pivot_control_messages_ros::FrankaError>(
+                    "franka_error", 1);
         mPublishTimer = nh->createTimer(
                 ros::Duration(0.05),
                &FrankaPivotControllerRos::statePublisher, this,
