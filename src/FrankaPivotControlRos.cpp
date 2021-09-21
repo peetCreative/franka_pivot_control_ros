@@ -9,6 +9,7 @@
 #include "pivot_control_messages_ros/FrankaError.h"
 #include "pivot_control_messages_ros/SetFloat.h"
 #include "pivot_control_messages_ros/SetJointSpacePose.h"
+#include "pivot_control_messages_ros/SetPose.h"
 #include "PivotControlMessagesRos.h"
 
 #include "ros/ros.h"
@@ -35,6 +36,7 @@ private:
     ros::Publisher mFrankaErrorPublisher;
     ros::ServiceServer mMoveCartesianZService;
     ros::ServiceServer mMoveJointSpaceService;
+    ros::ServiceServer mPivotToPoseService;
     ros::ServiceServer mStartPivotingService;
     ros::ServiceServer mStopPivotingService;
 public:
@@ -146,6 +148,14 @@ public:
         return succ;
     }
 
+    bool pivotToPose(
+        pivot_control_messages_ros::SetJointSpacePose::Request &req,
+        pivot_control_messages_ros::SetJointSpacePose::Response &response)
+    {
+        //TODO: implement
+        return false;
+    }
+
     int run()
     {
         if (!mFPC->isReady())
@@ -192,6 +202,10 @@ public:
         mFrankaErrorPublisher =
             nh->advertise<pivot_control_messages_ros::FrankaError>(
                     "franka_error", 1);
+        mPivotToPoseService =
+            nh->advertiseService(
+                "pivot_to_pose",
+                &FrankaPivotControllerRos::pivotToPose, this);
         mMoveCartesianZService =
             nh->advertiseService(
                 "move_cartesian_z",
