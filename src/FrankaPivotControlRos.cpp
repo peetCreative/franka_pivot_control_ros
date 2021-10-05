@@ -230,7 +230,6 @@ public:
     }
 };
 
-
 int main(int argc, char *argv[])
 {
     ros::init(argc, argv, "franka_pivot_control_ros");
@@ -240,10 +239,10 @@ int main(int argc, char *argv[])
     std::string paramName;
     std::string robotIP = "";
     std::string frameId = "laparoscope_pivot";
-    double distanceEE2PP = 0.5;
-    double distanceEE2CameraTip = 0.505;
+    double distanceEE2PP;
+    double distanceEE2TT;
     double dynamicRel = 0.05;
-    double cameraTilt = -0.52359;
+    double cameraTilt;
     if(!(pnh->searchParam("robot_ip", paramName) &&
             pnh->getParam(paramName, robotIP)))
     {
@@ -258,11 +257,27 @@ int main(int argc, char *argv[])
         ROS_INFO_STREAM_NAMED("franka_pivot_control_ros",
                               "set distanceEE2PP to " << distanceEE2PP);
     }
-    if(pnh->searchParam("distance_ee_to_camera_tip", paramName))
+    else
     {
-        pnh->getParam(paramName, distanceEE2CameraTip);
+        ROS_ERROR_STREAM_NAMED("franka_pivot_control_ros",
+                               "No distance end effector (flange) to pivot point given"
+                                       << " by argument distance_ee_to_pp");
+        ros::shutdown();
+        return 1;
+    }
+    if(pnh->searchParam("distance_ee_to_tt", paramName))
+    {
+        pnh->getParam(paramName, distanceEE2TT);
         ROS_INFO_STREAM_NAMED("franka_pivot_control_ros",
-                              "set distanceEE2CameraTip to " << distanceEE2CameraTip);
+                              "set distanceEE2ToolTip to " << distanceEE2TT);
+    }
+    else
+    {
+        ROS_ERROR_STREAM_NAMED("franka_pivot_control_ros",
+                              "No distance end effector (flange) to tool tip given"
+                              << " by argument distance_ee_to_tt");
+        ros::shutdown();
+        return 1;
     }
     if(pnh->searchParam("dynamic_rel", paramName))
     {
@@ -271,13 +286,23 @@ int main(int argc, char *argv[])
                               "set dynamicRel to " << dynamicRel);
     }
     if(pnh->searchParam("camera_tilt", paramName))
+    {
         pnh->getParam(paramName, cameraTilt);
+    }
+    else
+    {
+        ROS_ERROR_STREAM_NAMED("franka_pivot_control_ros",
+                               "No camera tilt given"
+                                       << " by argument camera_tilt");
+        ros::shutdown();
+        return 1;
+    }
 
     ROS_INFO_STREAM_NAMED("franka_pivot_control_ros",
                           "start pivot controller");
     FrankaPivotControllerRos fpcr(
             nh, robotIP, frameId,
-            distanceEE2PP, distanceEE2CameraTip,
+            distanceEE2PP, distanceEE2TT,
             dynamicRel, cameraTilt);
     return fpcr.run();
 }
