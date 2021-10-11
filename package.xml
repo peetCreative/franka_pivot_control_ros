@@ -5,7 +5,7 @@
     <description>
         ros package for connecting franka_pivot_control and ros
     </description>
-    <maintainer email="s1856172@mail.zih.tu-dresden.de">Peter Klausing</maintainer>
+    <maintainer email="peter.klausing@nct-dresden.de">Peter Klausing</maintainer>
     <license>GPLv3</license>
 
     <url type="repository">https://github.com/peetCreative/franka_pivot_control_ros</url>
