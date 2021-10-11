@@ -13,7 +13,7 @@
             output="screen" required="$(arg required)">
             <param name="robot_ip" value="$(arg robot_ip)"/>
             <param name="distance_ee_to_pp" value="$(arg distance_ee_to_pp)"/>
-            <param name="distance_ee_to_tt" default="$(arg distance_ee_to_tt)" />
+            <param name="distance_ee_to_tt" value="$(arg distance_ee_to_tt)" />
             <param name="dynamic_rel" value="$(arg dynamic_rel)"/>
             <param name="camera_tilt" value="$(arg camera_tilt)"/>
             <param name="frame_id" value="laparoscope"/>
