@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.16)
 project(franka_pivot_control_ros)
 
-add_compile_options(-std=c++14)
+SET(CMAKE_CXX_STANDARD 17)
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_LIST_DIR}/CMake")
 
 find_package(catkin REQUIRED COMPONENTS
@@ -13,14 +13,10 @@ find_package(catkin REQUIRED COMPONENTS
         tf2_geometry_msgs
         )
 
-SET(franka_pivot_control_HOME)
-SET(franka_pivot_control_LIBRARIES ${franka_pivot_control_HOME}/lib/libfranka_pivot_control.so)
-SET(franka_pivot_control_INCLUDE_DIR ${franka_pivot_control_HOME}/include)
-
-if (TARGET pivot_control_messages)
-    message("found pivot_control_messages")
+if (TARGET franka_pivot_control)
+    message("found franka_pivot_control")
 else()
-    add_subdirectory(pivot_control_messages)
+    add_subdirectory(franka_pivot_control)
 endif()
 
 catkin_package(
@@ -31,12 +27,10 @@ catkin_package(
 )
 
 set( CMAKE_CURRENT_BIN_DIR "${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}" )
-
+message(franka_pivot_control_INCLUDE_DIR:${franka_pivot_control_INCLUDE_DIR})
 include_directories(
         include
         ${catkin_INCLUDE_DIRS}
-        ${franka_pivot_control_INCLUDE_DIR}
-        pivot_control_messages/include
 )
 
 set( CMAKE_CURRENT_BIN_DIR "${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}" )
@@ -53,6 +47,6 @@ add_dependencies(${PROJECT_NAME} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries( ${PROJECT_NAME}
         ${catkin_LIBRARIES}
-        ${franka_pivot_control_LIBRARIES}
+        franka_pivot_control
         pivot_control_messages
         pivot_control_messages_ros)

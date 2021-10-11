@@ -1,3 +1,3 @@
-[submodule "pivot_control_messages"]
-	path = pivot_control_messages
-	url = https://github.com/peetCreative/pivot_control_messages.git
+[submodule "franka_pivot_control"]
+	path = franka_pivot_control
+	url = https://github.com/peetCreative/franka_pivot_control

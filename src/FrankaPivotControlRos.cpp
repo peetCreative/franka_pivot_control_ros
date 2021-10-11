@@ -1,7 +1,7 @@
 //
 // Created by peetcreative on 21.02.21.
 //
-#include "FrankaPivotController.h"
+#include "franka_pivot_control/FrankaPivotController.h"
 #include "PivotControlMessages.h"
 #include "pivot_control_messages_ros/LaparoscopeDOFPose.h"
 #include "pivot_control_messages_ros/LaparoscopeDOFBoundaries.h"
