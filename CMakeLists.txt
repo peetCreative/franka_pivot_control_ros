@@ -11,7 +11,15 @@ find_package(catkin REQUIRED COMPONENTS
         tf2
         tf2_ros
         tf2_geometry_msgs
+        franka_control
+        franka_msgs
         )
+
+catkin_package(
+#                INCLUDE_DIRS include
+        #  LIBRARIES esvr2_ros
+        LIBRARIES ${PROJECT_NAME}
+)
 
 if (TARGET franka_pivot_control)
     message("found franka_pivot_control")
@@ -19,18 +27,12 @@ else()
     add_subdirectory(franka_pivot_control)
 endif()
 
-catkin_package(
-#        INCLUDE_DIRS include
-        #  LIBRARIES esvr2_ros
-        CATKIN_DEPENDS roscpp
-        #  DEPENDS system_lib
-)
 
 set( CMAKE_CURRENT_BIN_DIR "${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}" )
-message(franka_pivot_control_INCLUDE_DIR:${franka_pivot_control_INCLUDE_DIR})
 include_directories(
-        include
-        ${catkin_INCLUDE_DIRS}
+        "include"
+        "franka_pivot_control/include"
+        "${catkin_INCLUDE_DIRS}"
 )
 
 set( CMAKE_CURRENT_BIN_DIR "${CATKIN_DEVEL_PREFIX}/${CATKIN_PACKAGE_SHARE_DESTINATION}" )
@@ -49,4 +51,4 @@ target_link_libraries( ${PROJECT_NAME}
         ${catkin_LIBRARIES}
         franka_pivot_control
         pivot_control_messages
-        pivot_control_messages_ros)
+        )
