@@ -1,0 +1,16 @@
+<launch>
+    <arg name="run_gdb_server" default="false"  />
+    <arg name="remote_address" default="" />
+    <arg name="remote_username" default="" />
+    <arg name="remote_env" default="/local_home/mediassist/workspace/catkin_ws_remote_deployment/env.sh" />
+    <arg name="robot_ip" default=""/>
+    <machine name="REMOTE"
+             address="$(arg remote_address)"
+             user="$(arg remote_username)"
+             env-loader="$(arg remote_env)"/>
+    <include file="$(find franka_pivot_control_ros)/launch/default.launch">
+        <arg name="robot_ip" value="$(arg robot_ip)"/>
+        <arg name="machine" value="REMOTE"/>
+        <arg name="run_gdb_server" default="$(arg run_gdb_server)" />
+    </include>
+</launch>

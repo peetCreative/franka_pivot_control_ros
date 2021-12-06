@@ -7,10 +7,13 @@
 <!--     <arg name="camera_tilt" default="-0.523599"/> -->
     <arg name="enable_keyboard_controller" default="false" />
     <arg name="required" default="true" />
+    <arg name="machine" default="" />
+    <arg name="run_gdb_server" default="false" />
     <group ns="franka_pivot_control">
 
         <node name="franka_pivot_control" pkg="franka_pivot_control_ros" type="franka_pivot_control_ros"
-            output="screen" required="$(arg required)">
+            output="screen" required="$(arg required)"
+            launch-prefix="$(eval 'gdbserver :1234' if run_gdb_server else '')" machine="$(arg machine)">
             <param name="robot_ip" value="$(arg robot_ip)"/>
             <param name="distance_ee_to_pp" value="$(arg distance_ee_to_pp)"/>
             <param name="distance_ee_to_tt" value="$(arg distance_ee_to_tt)" />
