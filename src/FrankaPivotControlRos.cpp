@@ -517,6 +517,7 @@ int main(int argc, char *argv[])
     ros::init(argc, argv, "franka_pivot_control_ros");
     ros::NodeHandle *nh = new ros::NodeHandle();
     ros::NodeHandle *pnh = new ros::NodeHandle("~");
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 
     std::string paramName;
     std::string robotIP = "";
