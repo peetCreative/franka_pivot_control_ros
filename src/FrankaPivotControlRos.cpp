@@ -19,6 +19,7 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/TransformStamped.h>
 #include <std_srvs/Trigger.h>
+#include <ros/console.h>
 
 #include <memory>
 
@@ -431,16 +432,21 @@ public:
 
     int run()
     {
+        ROS_INFO_STREAM_NAMED("franka_pivot_control_ros",
+                              "run");
+        mFPC->startPivoting();
         if (!mFPC->isReady())
         {
-             ROS_DEBUG_NAMED("FrankaPivotControllerROS", "Stop");
+            ROS_INFO_NAMED("FrankaPivotControllerROS", "Stop Franka Pivot Controller not ready");
             ros::shutdown();
+            mFPC->stopPivoting();
             return 0;
         }
         while(ros::ok())
         {
             ros::spinOnce();
         }
+        ROS_INFO_STREAM_NAMED("franka_pivot_control_ros", "Finishing");
         return 0;
     }
 
